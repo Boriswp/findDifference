@@ -1,23 +1,26 @@
 package com.example.myapplication
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
-import android.os.CountDownTimer
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.myapplication.ui.theme.MyApplicationTheme
@@ -25,8 +28,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import java.util.*
-import kotlin.math.abs
+import kotlin.random.Random
 
 
 class MainActivity : ComponentActivity() {
@@ -97,28 +99,176 @@ fun GreetingScreen(isGameScreen: MutableState<Boolean>) {
 
 @Composable
 fun GameScreen(isGameScreen: MutableState<Boolean>) {
-    val youWin = rememberSaveable {
-        mutableStateOf(false)
+    val currState = remember {
+        mutableStateOf<UserState>(UserState.Initial)
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        val progressAnimDuration = 1500
 
-        LinearProgressIndicator(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(30.dp), // Rounded edges
-            progress = animateFloatAsState(
-                targetValue = 1F,
+        if (currState.value == UserState.Lose) {
+            YouLoseDialog(isGameScreen = isGameScreen)
+        }
+
+        if (currState.value == UserState.Win) {
+            YouWinDialog(isGameScreen = isGameScreen)
+        }
+
+        MyIndicator(currState)
+
+        Box {
+            val isReversed by remember {
+                mutableStateOf(Random.nextBoolean())
+            }
+            var targetValue by remember { mutableStateOf(if (isReversed) 1f else 0f) }
+            val imageAlpha: Float by animateFloatAsState(
+                targetValue = targetValue,
                 animationSpec = tween(
-                    durationMillis = progressAnimDuration,
-                    easing = FastOutSlowInEasing
+                    durationMillis = 7000,
+                    delayMillis = 2000,
+                    easing = LinearEasing,
                 )
-            ).value
-        )
+            )
 
-        Box() {
+            SideEffect {
+                targetValue = if (isReversed) 0f else 1f
+            }
+
+            Image(
+                painter = painterResource(id = R.drawable.background_image),
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds
+            )
+            Box(
+                Modifier
+                    .padding(100.dp, 300.dp)
+            ) {
+                Image(painter = painterResource(id = R.drawable.alpha_image),
+                    alpha = imageAlpha,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .clickable { currState.value = UserState.Win }
+                )
+            }
         }
     }
+}
 
+
+@Composable
+fun YouWinDialog(isGameScreen: MutableState<Boolean>) {
+    AlertDialog(
+        onDismissRequest = {
+            isGameScreen.value = false
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Ты Выиграл!",
+                    textAlign = TextAlign.Center,
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    onClick = {
+                        isGameScreen.value = false
+                    }, modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(40.dp)
+                ) {
+                    Text("В меню")
+                }
+
+                Button(
+                    onClick = {
+                    }, modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(40.dp)
+                ) {
+                    Text("Далее")
+                }
+            }
+        },
+        buttons = {
+
+        }, shape = RoundedCornerShape(15.dp)
+    )
+}
+
+@Composable
+fun YouLoseDialog(isGameScreen: MutableState<Boolean>) {
+    AlertDialog(
+        onDismissRequest = {
+            isGameScreen.value = false
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Ты проиграл!",
+                    textAlign = TextAlign.Center,
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    onClick = {
+                        isGameScreen.value = false
+                    }, modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(40.dp)
+                ) {
+                    Text("В меню")
+                }
+
+                Button(
+                    onClick = {
+                    }, modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(40.dp)
+                ) {
+                    Text("Повторить")
+                }
+            }
+        },
+        buttons = {
+
+        }, shape = RoundedCornerShape(15.dp)
+    )
+}
+
+@Composable
+fun MyIndicator(state: MutableState<UserState>) {
+    var targetValue by remember { mutableStateOf(0f) }
+    val progressAnimDuration = 12000
+    val progressAnimation by animateFloatAsState(
+        targetValue = targetValue,
+        animationSpec = tween(
+            durationMillis = progressAnimDuration,
+            delayMillis = 10,
+            easing = LinearEasing
+        ),
+        finishedListener = {
+            if (state.value != UserState.Win) {
+                state.value = UserState.Lose
+            }
+        }
+    )
+
+    SideEffect { targetValue = 1f }
+
+    LinearProgressIndicator(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(30.dp),
+        progress = progressAnimation
+    )
 }
