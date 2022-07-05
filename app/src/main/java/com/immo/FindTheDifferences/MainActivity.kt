@@ -3,6 +3,7 @@ package com.immo.FindTheDifferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +17,12 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.immo.FindTheDifferences.ui.theme.MyApplicationTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
+class MainActivity : ComponentActivity()  {
 
-class MainActivity : ComponentActivity() {
+    val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        MainScreen()
+                        MainScreen(viewModel)
                         AndroidView(
                             modifier = Modifier.fillMaxWidth(),
                             factory = { context ->

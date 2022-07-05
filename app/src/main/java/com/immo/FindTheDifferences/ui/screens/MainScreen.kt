@@ -6,10 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
+import com.immo.FindTheDifferences.MainActivityViewModel
 
 
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainActivityViewModel) {
     val isGameScreen = rememberSaveable {
         mutableStateOf(false)
     }
@@ -24,6 +25,6 @@ fun MainScreen() {
     if (!isGameScreen.value) {
         GreetingScreen(isGameScreen)
     } else {
-        GameScreen(isGameScreen)
+        GameScreen(isGameScreen,viewModel)
     }
 }

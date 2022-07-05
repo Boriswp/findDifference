@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.immo.FindTheDifferences.Const
+import com.immo.FindTheDifferences.MainActivityViewModel
 import com.immo.FindTheDifferences.UserState
 import com.immo.FindTheDifferences.ui.components.TimeIndicator
 import com.immo.FindTheDifferences.ui.dialogs.YouLoseDialog
@@ -22,7 +23,7 @@ import com.immo.FindTheDifferences.ui.dialogs.YouWinDialog
 import kotlin.random.Random
 
 @Composable
-fun GameScreen(isGameScreen: MutableState<Boolean>) {
+fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewModel) {
     val currState = remember {
         mutableStateOf<UserState>(UserState.Initial)
     }
@@ -58,7 +59,7 @@ fun GameScreen(isGameScreen: MutableState<Boolean>) {
             }
 
             Image(
-                painter = painterResource(id = com.example.myapplication.R.drawable.background_image),
+                painter = painterResource(id = com.immo.FindTheDifferences.R.drawable.background_image),
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds
             )
@@ -66,7 +67,7 @@ fun GameScreen(isGameScreen: MutableState<Boolean>) {
                 Modifier
                     .padding(100.dp, 300.dp)
             ) {
-                Image(painter = painterResource(id = com.example.myapplication.R.drawable.alpha_image),
+                Image(painter = painterResource(id = com.immo.FindTheDifferences.R.drawable.alpha_image),
                     alpha = imageAlpha,
                     contentDescription = null,
                     contentScale = ContentScale.FillBounds,
