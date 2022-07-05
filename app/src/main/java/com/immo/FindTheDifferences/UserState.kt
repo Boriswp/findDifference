@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.immo.FindTheDifferences
 
 sealed class UserState {
     object Initial : UserState()

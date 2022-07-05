@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.immo.FindTheDifferences
 
 import org.junit.Test
 

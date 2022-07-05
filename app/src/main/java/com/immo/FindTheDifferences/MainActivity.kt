@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.immo.FindTheDifferences
 
 import android.app.Activity
 import android.os.Bundle
@@ -23,7 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.immo.FindTheDifferences.ui.theme.MyApplicationTheme
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView

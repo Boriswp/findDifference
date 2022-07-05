@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "776917017861",
+    "project_id": "finddifference-a8507",
+    "storage_bucket": "finddifference-a8507.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:776917017861:android:70a898dc0bb6c595a1c36c",
+        "android_client_info": {
+          "package_name": "com.immo.FindTheDifferences"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "776917017861-s5oo80iju64ch95n836gb546gve4a7j9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLYMbMa__skcrENxr_q7vlwIW2f2LBvZY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "776917017861-s5oo80iju64ch95n836gb546gve4a7j9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
