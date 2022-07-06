@@ -26,5 +26,37 @@ fun getTranslatable(
         )
     )
 
+val main_title = getTranslatable(
+    "Тест на внимательность",
+    "The Mindfulness Test",
+    "Bilinçli Farkındalık (Mindfulness) Ölçeği Testi",
+    "Teste de atenção plena"
+)
 
+val main_play_button = getTranslatable("Начать", "Start", "Başlamak", "Começar")
+
+val dialog_win = getTranslatable(
+    "Молодец! давай дальше!",
+    "Well done! Move on!",
+    " Молодец! давай дальше!",
+    "Bem feito! Ir em frente!"
+)
+
+val game_lvl_finished = getTranslatable("угадано", "guessed ", "'i tahmin etti", "adivinhou")
+
+val game_lvl_of = getTranslatable("из", "out of", "'den", "de")
+
+val game_end = getTranslatable(
+    "Обновление будет доступно через неделю",
+    "The update will be available in a week",
+    "Güncelleme bir hafta içinde kullanıma sunulacak ",
+    "A atualização estará disponível em uma semana"
+)
+
+val like_app = getTranslatable(
+    "Нравится приложение? Оцени его ",
+    "Like the app? rate it! ",
+    "Siz uygulamayı beğendiniz mi?",
+    "Siz uygulamayı beğendiniz mi?"
+)
 

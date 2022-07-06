@@ -11,6 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.immo.FindTheDifferences.localization.*
+import com.immo.FindTheDifferences.localization.Vocabulary.localization
 
 @Composable
 fun YouWinDialog(isGameScreen: MutableState<Boolean>) {
@@ -25,7 +27,7 @@ fun YouWinDialog(isGameScreen: MutableState<Boolean>) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Ты Выиграл!",
+                    text = localization.dialog_win(),
                     textAlign = TextAlign.Center,
                 )
 

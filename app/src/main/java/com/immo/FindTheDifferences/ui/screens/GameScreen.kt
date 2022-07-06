@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -20,6 +22,9 @@ import com.immo.FindTheDifferences.UserState
 import com.immo.FindTheDifferences.ui.components.TimeIndicator
 import com.immo.FindTheDifferences.ui.dialogs.YouLoseDialog
 import com.immo.FindTheDifferences.ui.dialogs.YouWinDialog
+import com.immo.FindTheDifferences.localization.*
+import com.immo.FindTheDifferences.localization.Vocabulary.localization
+
 import kotlin.random.Random
 
 @Composable
@@ -74,6 +79,9 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
                     modifier = Modifier
                         .clickable { currState.value = UserState.Win }
                 )
+            }
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+                Text(text = "${localization.game_lvl_finished()} +${0}+${localization.game_lvl_of()} + ${1}")
             }
         }
     }
