@@ -5,7 +5,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import java.util.Locale
 
-internal val defaultLocalization: Localization = Localization(Locale("ru"))
+internal val defaultLocalization: Localization = Localization(Locale("en"))
 
 private val supportedLocales: MutableSet<Locale> = mutableSetOf()
 
