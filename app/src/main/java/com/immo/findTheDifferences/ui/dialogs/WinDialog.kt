@@ -1,6 +1,7 @@
 package com.immo.findTheDifferences.ui.dialogs
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
@@ -19,7 +20,7 @@ import com.immo.findTheDifferences.localization.Vocabulary.localization
 import com.immo.findTheDifferences.ui.theme.Typography
 
 @Composable
-fun YouWinDialog(isGameScreen: MutableState<Boolean>) {
+fun YouWinDialog(isGameScreen: MutableState<Boolean>, callback: () -> Unit) {
     AlertDialog(
         onDismissRequest = {
             isGameScreen.value = false
@@ -33,7 +34,7 @@ fun YouWinDialog(isGameScreen: MutableState<Boolean>) {
                 Text(
                     text = localization.dialog_win(),
                     textAlign = TextAlign.Center,
-                    style = Typography.h1
+                    style = Typography.h2
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -41,12 +42,15 @@ fun YouWinDialog(isGameScreen: MutableState<Boolean>) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_home),
-                        contentDescription = "home"
+                        contentDescription = "home",
+                        modifier = Modifier.clickable { isGameScreen.value = false }
+
                     )
 
                     Image(
                         painter = painterResource(id = R.drawable.ic_next),
-                        contentDescription = "next"
+                        contentDescription = "next",
+                        modifier = Modifier.clickable { callback() }
                     )
                 }
             }

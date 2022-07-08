@@ -20,7 +20,14 @@ val Typography = Typography(
     h1 = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 20.sp,
+        fontSize = 30.sp,
+        fontStyle = FontStyle.Italic
+    ),
+
+    h2 = TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 25.sp,
         fontStyle = FontStyle.Italic
     ),
 

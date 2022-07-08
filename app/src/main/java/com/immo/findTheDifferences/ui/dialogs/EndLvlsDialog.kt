@@ -63,6 +63,7 @@ fun EndLvlsDialog(isGameScreen: MutableState<Boolean>) {
                                     }
                                 } else {
                                     val reviewErrorCode = task.exception
+                                    isGameScreen.value = false
                                 }
                             }
                         }

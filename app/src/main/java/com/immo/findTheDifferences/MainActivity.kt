@@ -11,16 +11,23 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import com.immo.findTheDifferences.ui.screens.MainScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.immo.findTheDifferences.ui.screens.MainScreen
 import com.immo.findTheDifferences.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.util.*
+
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity()  {
+class MainActivity : ComponentActivity() {
 
     private val viewModel: MainActivityViewModel by viewModels()
 
@@ -49,5 +56,24 @@ class MainActivity : ComponentActivity()  {
                 }
             }
         }
+        observeViewModel()
     }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    when (state) {
+                        is InternetState.Fetched -> {
+
+                        }
+                        is InternetState.Error -> {
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 }

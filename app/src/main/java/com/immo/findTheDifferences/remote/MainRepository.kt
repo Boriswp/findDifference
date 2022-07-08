@@ -1,10 +1,10 @@
 package com.immo.findTheDifferences.remote
 
-import com.immo.findTheDifferences.prefs.PreferenceManager
+import com.immo.findTheDifferences.prefs.PreferenceManagerImpl
 import javax.inject.Inject
 
 class MainRepository @Inject constructor(
     private val apiService: ApiInterface,
-    //private val prefMgr: PreferenceManager
+    private val prefMgr: PreferenceManagerImpl
 ) {
 }

@@ -1,6 +1,7 @@
 package com.immo.findTheDifferences.ui.dialogs
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
@@ -15,7 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun YouLoseDialog(isGameScreen: MutableState<Boolean>) {
+fun YouLoseDialog(isGameScreen: MutableState<Boolean>, callback: () -> Unit) {
     AlertDialog(
         onDismissRequest = {
             isGameScreen.value = false
@@ -27,12 +28,14 @@ fun YouLoseDialog(isGameScreen: MutableState<Boolean>) {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_home),
-                    contentDescription = "home"
+                    contentDescription = "home",
+                    modifier = Modifier.clickable { isGameScreen.value = false }
                 )
 
                 Image(
                     painter = painterResource(id = R.drawable.ic_retry),
-                    contentDescription = "retry"
+                    contentDescription = "retry",
+                    modifier = Modifier.clickable { callback() }
                 )
             }
         },

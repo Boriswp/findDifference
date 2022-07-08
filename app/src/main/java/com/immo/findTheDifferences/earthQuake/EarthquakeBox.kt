@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
@@ -34,7 +36,7 @@ fun EarthquakeBox(
     content: @Composable IEarthquakeScope.() -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-
+    val haptic = LocalHapticFeedback.current
     val state = remember { EarthquakeState() }
     val scope = remember { EarthquakeScope(state = state) }
     val mover = remember { EarthquakeMover() }
@@ -51,6 +53,7 @@ fun EarthquakeBox(
 
     LaunchedEffect(state.isShaking) {
         if (state.isShaking) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
             controller.startShaking(
                 earthquakeDuration = state.earthquakeDuration,
                 shakeDuration = 1000L / state.shakesPerSecond,
@@ -65,8 +68,8 @@ fun EarthquakeBox(
         modifier = Modifier
             .alpha(mover.alpha.value)
             .offset(mover.x.value.dp, mover.y.value.dp)
-            .rotate(mover.rotation.value)
-            //.padding(state.shakeForce.dp)
+        //.rotate(mover.rotation.value)
+        //.padding(state.shakeForce.dp)
     ) {
         scope.content()
     }
