@@ -1,4 +1,6 @@
 package com.immo.findTheDifferences.remote
 
-object EndPoints {}
+object EndPoints {
+    const val TXT_DATA = "data.txt"
+}
 

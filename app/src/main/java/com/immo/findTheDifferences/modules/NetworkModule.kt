@@ -1,7 +1,8 @@
 package com.immo.findTheDifferences.modules
 
 import android.annotation.SuppressLint
-import com.squareup.moshi.Moshi
+import com.immo.findTheDifferences.Const
+import com.immo.findTheDifferences.remote.ApiInterface
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,10 +10,10 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import com.immo.findTheDifferences.remote.ApiInterface
 import timber.log.Timber
 import javax.inject.Singleton
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.HttpsURLConnection
 
 
 @Module
@@ -50,6 +51,7 @@ object NetworkModule {
             )
             return@Interceptor response
         }
+
         return OkHttpClient.Builder()
             .addInterceptor(interceptor)
             .followRedirects(false)
@@ -57,18 +59,12 @@ object NetworkModule {
             .build()
     }
 
-    @Singleton
-    @Provides
-    fun provideMoshi(): Moshi {
-        return Moshi.Builder().build()
-    }
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl("http:url")
+            .baseUrl(Const.BASE_URL)
             .client(okHttpClient)
             .build()
     }

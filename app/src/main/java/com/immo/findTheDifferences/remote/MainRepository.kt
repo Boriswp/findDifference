@@ -7,4 +7,5 @@ class MainRepository @Inject constructor(
     private val apiService: ApiInterface,
     private val prefMgr: PreferenceManagerImpl
 ) {
+    suspend fun getTxtFile() = apiService.downloadTxtFile()
 }

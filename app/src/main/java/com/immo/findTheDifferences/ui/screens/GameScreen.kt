@@ -19,18 +19,20 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.immo.findTheDifferences.Const
-import com.immo.findTheDifferences.MainActivityViewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.immo.findTheDifferences.*
 import com.immo.findTheDifferences.R
-import com.immo.findTheDifferences.UserState
 import com.immo.findTheDifferences.earthQuake.EarthquakeBox
 import com.immo.findTheDifferences.localization.Vocabulary.localization
 import com.immo.findTheDifferences.localization.game_lvl_finished
 import com.immo.findTheDifferences.localization.game_lvl_of
+import com.immo.findTheDifferences.remote.FilesData
 import com.immo.findTheDifferences.ui.components.TimeIndicator
 import com.immo.findTheDifferences.ui.dialogs.EndLvlsDialog
 import com.immo.findTheDifferences.ui.dialogs.YouLoseDialog
@@ -50,60 +52,52 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
     val currLvl = rememberSaveable {
         mutableStateOf(0)
     }
-    val lvlList = arrayListOf(R.drawable.img_1, R.drawable.img_2, R.drawable.img_3)
-    val alphaList = arrayListOf(R.drawable.img_1_1, R.drawable.img_2_2, R.drawable.img_3_3)
-    val paddingTop = arrayListOf(485, 500, 370)
-    val paddingLeft = arrayListOf(225, 30, 220)
-    val sizeX = arrayListOf(80, 46, 50)
-    val sizeY = arrayListOf(45, 70, 50)
-    val listIndexes by remember { mutableStateOf((0 until lvlList.size).shuffled()) }
+    when (val res = viewModel.lvlDataViewState.collectAsState().value) {
+        is LvlDataViewState.Success -> {
+            val lvlList = res.response
+            val listIndexes by remember { mutableStateOf((lvlList.indices).shuffled()) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
 
-        if (currState.value == UserState.Lose) {
-            YouLoseDialog(isGameScreen = isGameScreen) {
-                tapCounts.value = 0
-                currState.value = UserState.Initial
-            }
-        }
-
-        if (currState.value == UserState.Win) {
-            if (currLvl.value < lvlList.size - 1) {
-                YouWinDialog(isGameScreen = isGameScreen) {
-                    currLvl.value++
-                    tapCounts.value = 0
-                    currState.value = UserState.Initial
+                if (currState.value == UserState.Lose) {
+                    YouLoseDialog(isGameScreen = isGameScreen) {
+                        tapCounts.value = 0
+                        currState.value = UserState.Initial
+                    }
                 }
-            } else {
-                EndLvlsDialog(isGameScreen = isGameScreen)
+
+                if (currState.value == UserState.Win) {
+                    if (currLvl.value < lvlList.size - 1) {
+                        YouWinDialog(isGameScreen = isGameScreen) {
+                            currLvl.value++
+                            tapCounts.value = 0
+                            currState.value = UserState.Initial
+                        }
+                    } else {
+                        EndLvlsDialog(isGameScreen = isGameScreen)
+                    }
+                }
+
+
+                LvlLogic(
+                    currState = currState,
+                    lvlList[listIndexes[currLvl.value]],
+                    lvlList.size,
+                    currLvl,
+                    tapCounts
+                )
             }
         }
-
-
-        LvlLogic(
-            currState = currState,
-            lvlList[listIndexes[currLvl.value]],
-            alphaList[listIndexes[currLvl.value]],
-            paddingTop[listIndexes[currLvl.value]],
-            paddingLeft[listIndexes[currLvl.value]],
-            sizeX[listIndexes[currLvl.value]],
-            sizeY[listIndexes[currLvl.value]],
-            lvlList.size,
-            currLvl,
-            tapCounts
-        )
+        is LvlDataViewState.Error -> {
+            //TODO
+        }
     }
 }
 
 @Composable
 fun LvlLogic(
     currState: MutableState<UserState>,
-    currLvlImage: Int,
-    currAlphaLvlImage: Int,
-    paddingTop: Int,
-    paddingLeft: Int,
-    sizeX: Int,
-    sizeY: Int,
+    currLvlData: FilesData,
     totalLvls: Int,
     currLvl: MutableState<Int>,
     tapCounts: MutableState<Int>,
@@ -111,10 +105,6 @@ fun LvlLogic(
     val haptic = LocalHapticFeedback.current
     val configuration = LocalConfiguration.current
     var bottomHeight by remember {
-        mutableStateOf(0)
-    }
-
-    var imgHeight by remember {
         mutableStateOf(0)
     }
 
@@ -151,15 +141,29 @@ fun LvlLogic(
                 targetValue = if (isReversed) Const.targetStart else Const.targetEnd
             }
 
+            val painterBack = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(Const.BASE_URL_FOR_PICTURES + currLvlData.picture_background)
+                    .crossfade(200)
+                    .build()
+            )
+
+            val painterFront = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(Const.BASE_URL_FOR_PICTURES + currLvlData.picture_foreground)
+                    .crossfade(200)
+                    .build()
+            )
+
             Image(
-                painter = painterResource(id = currLvlImage),
+                painter = painterBack,
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .fillMaxSize()
             )
             Image(
-                painter = painterResource(id = currAlphaLvlImage),
+                painter = painterFront,
                 alpha = imageAlpha,
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
@@ -180,15 +184,6 @@ fun LvlLogic(
                         interactionSource = interactionSource
                     )
                     .fillMaxSize()
-            )
-        } else {
-            Image(
-                painter = painterResource(id = currAlphaLvlImage),
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier
-                    .fillMaxSize()
-
             )
         }
         Box(
@@ -218,11 +213,11 @@ fun LvlLogic(
         Box(
             Modifier
                 .padding(
-                    start = (paddingLeft * start).dp,
-                    top = ((paddingTop * top).dp)
+                    start = (currLvlData.padding_left * start).dp,
+                    top = ((currLvlData.padding_top * top).dp)
                 )
-                .height(sizeY.dp)
-                .width(sizeX.dp)
+                .height(currLvlData.object_height.dp)
+                .width(currLvlData.object_width.dp)
                 .clickable { if (!isShaking) currState.value = UserState.Win }
         )
 

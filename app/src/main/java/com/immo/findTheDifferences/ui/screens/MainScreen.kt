@@ -2,10 +2,16 @@ package com.immo.findTheDifferences.ui.screens
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.immo.findTheDifferences.MainActivityViewModel
 
 
@@ -25,6 +31,6 @@ fun MainScreen(viewModel: MainActivityViewModel) {
     if (!isGameScreen.value) {
         GreetingScreen(isGameScreen)
     } else {
-        GameScreen(isGameScreen,viewModel)
+        GameScreen(isGameScreen, viewModel)
     }
 }
