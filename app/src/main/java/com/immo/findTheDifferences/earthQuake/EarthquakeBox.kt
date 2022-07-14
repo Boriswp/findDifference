@@ -3,6 +3,7 @@ package com.immo.findTheDifferences.earthQuake
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -14,7 +15,7 @@ class EarthquakeState {
     var isShaking by mutableStateOf(false)
     var earthquakeDuration by mutableStateOf(500L)
     var shakesPerSecond by mutableStateOf(10)
-    var shakeForce by mutableStateOf(10)
+    var shakeForce by mutableStateOf(20)
 }
 
 @Composable
@@ -54,7 +55,7 @@ fun EarthquakeBox(
     Box(
         modifier = Modifier
             .alpha(mover.alpha.value)
-            .offset(mover.x.value.dp, mover.y.value.dp)
+            .offset(mover.x.value.dp, mover.y.value.dp),
         //.rotate(mover.rotation.value)
         //.padding(state.shakeForce.dp)
     ) {

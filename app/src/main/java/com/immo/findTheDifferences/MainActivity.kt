@@ -23,8 +23,6 @@ import com.immo.findTheDifferences.ui.screens.MainScreen
 import com.immo.findTheDifferences.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import org.json.JSONObject
-import java.util.*
 
 
 @AndroidEntryPoint
@@ -34,8 +32,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.getTxtFileData()
-
         MobileAds.initialize(this) {}
         setContent {
             MyApplicationTheme {

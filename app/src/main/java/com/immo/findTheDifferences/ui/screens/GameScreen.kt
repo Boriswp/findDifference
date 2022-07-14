@@ -1,5 +1,7 @@
 package com.immo.findTheDifferences.ui.screens
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -9,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -24,8 +27,14 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.*
 import coil.request.ImageRequest
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.immo.findTheDifferences.*
 import com.immo.findTheDifferences.R
 import com.immo.findTheDifferences.earthQuake.EarthquakeBox
@@ -38,6 +47,7 @@ import com.immo.findTheDifferences.ui.dialogs.EndLvlsDialog
 import com.immo.findTheDifferences.ui.dialogs.YouLoseDialog
 import com.immo.findTheDifferences.ui.dialogs.YouWinDialog
 import com.immo.findTheDifferences.ui.theme.Typography
+import timber.log.Timber
 import kotlin.random.Random
 
 @Composable
@@ -49,43 +59,57 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
     val tapCounts = rememberSaveable {
         mutableStateOf(0)
     }
-    val currLvl = rememberSaveable {
-        mutableStateOf(0)
-    }
+
     when (val res = viewModel.lvlDataViewState.collectAsState().value) {
         is LvlDataViewState.Success -> {
-            val lvlList = res.response
-            val listIndexes by remember { mutableStateOf((lvlList.indices).shuffled()) }
-
+            val lvlList = res.response.filesData
+            val listIndexes = res.response.indexes
+            val currLvl = rememberSaveable {
+                mutableStateOf(res.response.currLvl)
+            }
             Column(modifier = Modifier.fillMaxSize()) {
 
-                if (currState.value == UserState.Lose) {
-                    YouLoseDialog(isGameScreen = isGameScreen) {
-                        tapCounts.value = 0
-                        currState.value = UserState.Initial
+                when (currState.value) {
+                    is UserState.Initial -> {
+                        LvlLogic(
+                            currState = currState,
+                            lvlList,
+                            listIndexes,
+                            lvlList.size,
+                            currLvl,
+                            tapCounts
+                        )
                     }
-                }
-
-                if (currState.value == UserState.Win) {
-                    if (currLvl.value < lvlList.size - 1) {
-                        YouWinDialog(isGameScreen = isGameScreen) {
-                            currLvl.value++
+                    is UserState.Lose -> {
+                        YouLoseDialog(isGameScreen = isGameScreen) {
                             tapCounts.value = 0
                             currState.value = UserState.Initial
                         }
-                    } else {
-                        EndLvlsDialog(isGameScreen = isGameScreen)
+                    }
+                    is UserState.Win -> {
+                        if (currLvl.value < lvlList.size - 1) {
+                            YouWinDialog(isGameScreen = isGameScreen) {
+                                currLvl.value++
+                                viewModel.setCurrLvl(currLvl.value)
+                                tapCounts.value = 0
+//                                if (currLvl.value % 2 == 0) {
+//                                    if (viewModel.isFirstLaunch && currLvl.value < 2) {
+//                                        currState.value = UserState.Initial
+//                                    } else {
+//                                        currState.value = UserState.ShowAd
+//                                    }
+//                                } else {
+                                    currState.value = UserState.Initial
+                               // }
+                            }
+                        } else {
+                            EndLvlsDialog(isGameScreen = isGameScreen)
+                        }
+                    }
+                    is UserState.ShowAd -> {
+                        showAd(LocalContext.current) { currState.value = UserState.Initial }
                     }
                 }
-
-
-                LvlLogic(
-                    currState = currState,
-                    lvlList[listIndexes[currLvl.value]],
-                    lvlList.size,
-                    currLvl,
-                    tapCounts
-                )
             }
         }
         is LvlDataViewState.Error -> {
@@ -97,7 +121,8 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
 @Composable
 fun LvlLogic(
     currState: MutableState<UserState>,
-    currLvlData: FilesData,
+    currLvlsData: List<FilesData>,
+    listIndexes: List<Int>,
     totalLvls: Int,
     currLvl: MutableState<Int>,
     tapCounts: MutableState<Int>,
@@ -108,12 +133,17 @@ fun LvlLogic(
         mutableStateOf(0)
     }
 
+    var ready by remember {
+        mutableStateOf(false)
+    }
+
     var height by remember {
         mutableStateOf(0)
     }
 
-
-    TimeIndicator(currState)
+    if (ready) {
+        TimeIndicator(currState)
+    }
 
     EarthquakeBox(
         onEarthquakeFinished = {
@@ -123,69 +153,71 @@ fun LvlLogic(
         val interactionSource = remember { MutableInteractionSource() }
 
 
-        if (currState.value == UserState.Initial) {
-            val isReversed by remember {
-                mutableStateOf(Random.nextBoolean())
-            }
-            var targetValue by remember { mutableStateOf(if (isReversed) Const.targetEnd else Const.targetStart) }
-            val imageAlpha: Float by animateFloatAsState(
-                targetValue = targetValue,
-                animationSpec = tween(
-                    durationMillis = Const.objectDurationAnimMS,
-                    delayMillis = Const.objectDelayAnimMS,
-                    easing = LinearEasing,
-                )
-            )
-
-            SideEffect {
-                targetValue = if (isReversed) Const.targetStart else Const.targetEnd
-            }
-
-            val painterBack = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(Const.BASE_URL_FOR_PICTURES + currLvlData.picture_background)
-                    .crossfade(200)
-                    .build()
-            )
-
-            val painterFront = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(Const.BASE_URL_FOR_PICTURES + currLvlData.picture_foreground)
-                    .crossfade(200)
-                    .build()
-            )
-
-            Image(
-                painter = painterBack,
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-            Image(
-                painter = painterFront,
-                alpha = imageAlpha,
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier
-                    .clickable(
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            if (!isShaking) {
-                                tapCounts.value++
-                                if (tapCounts.value < Const.loseTapCounts) {
-                                    startShaking()
-                                } else {
-                                    currState.value = UserState.Lose
-                                }
-                            }
-                        },
-                        indication = null,
-                        interactionSource = interactionSource
-                    )
-                    .fillMaxSize()
-            )
+        val isReversed by remember {
+            mutableStateOf(Random.nextBoolean())
         }
+        var targetValue by remember { mutableStateOf(if (isReversed) Const.targetEnd else Const.targetStart) }
+        val imageAlpha: Float by animateFloatAsState(
+            targetValue = targetValue,
+            animationSpec = tween(
+                durationMillis = Const.objectDurationAnimMS,
+                delayMillis = Const.objectDelayAnimMS,
+                easing = LinearEasing,
+            )
+        )
+
+        SideEffect {
+            targetValue = if (isReversed) Const.targetStart else Const.targetEnd
+        }
+
+        SubcomposeAsyncImage(
+            model = Const.BASE_URL_FOR_PICTURES + currLvlsData[listIndexes[currLvl.value]].picture_background,
+            contentDescription = "",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            val state = painter.state
+            if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
+                CircularProgressIndicator()
+            } else {
+                ready = true
+                SubcomposeAsyncImageContent()
+            }
+        }
+
+        SubcomposeAsyncImage(
+            model = Const.BASE_URL_FOR_PICTURES + currLvlsData[listIndexes[currLvl.value]].picture_foreground,
+            contentDescription = "",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .clickable(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        if (!isShaking) {
+                            tapCounts.value++
+                            if (tapCounts.value < Const.loseTapCounts) {
+                                startShaking()
+                            } else {
+                                currState.value = UserState.Lose
+                            }
+                        }
+                    },
+                    indication = null,
+                    interactionSource = interactionSource
+                )
+                .fillMaxSize(),
+            alpha = imageAlpha
+        ) {
+            val state = painter.state
+            if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
+                CircularProgressIndicator()
+            } else {
+                ready = true
+                SubcomposeAsyncImageContent()
+            }
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -204,7 +236,6 @@ fun LvlLogic(
                     }
             )
         }
-
         height = configuration.screenHeightDp - bottomHeight
         val top =
             if (Const.imageHeight < height) Const.imageHeight / height else height / Const.imageHeight
@@ -213,13 +244,12 @@ fun LvlLogic(
         Box(
             Modifier
                 .padding(
-                    start = (currLvlData.padding_left * start).dp,
-                    top = ((currLvlData.padding_top * top).dp)
+                    start = (currLvlsData[listIndexes[currLvl.value]].padding_left * start).dp,
+                    top = ((currLvlsData[listIndexes[currLvl.value]].padding_top * top).dp)
                 )
-                .height(currLvlData.object_height.dp)
-                .width(currLvlData.object_width.dp)
+                .height(currLvlsData[listIndexes[currLvl.value]].object_height.dp)
+                .width(currLvlsData[listIndexes[currLvl.value]].object_width.dp)
                 .clickable { if (!isShaking) currState.value = UserState.Win }
         )
-
     }
 }

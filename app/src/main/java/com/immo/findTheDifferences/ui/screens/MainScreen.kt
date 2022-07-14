@@ -31,6 +31,7 @@ fun MainScreen(viewModel: MainActivityViewModel) {
     if (!isGameScreen.value) {
         GreetingScreen(isGameScreen)
     } else {
+        viewModel.prepareLvls()
         GameScreen(isGameScreen, viewModel)
     }
 }

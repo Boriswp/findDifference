@@ -6,6 +6,7 @@ import com.immo.findTheDifferences.Utils.prepareToJsonConvert
 import com.immo.findTheDifferences.Utils.readTextFile
 import com.immo.findTheDifferences.remote.FilesData
 import com.immo.findTheDifferences.remote.MainRepository
+import com.immo.findTheDifferences.remote.UserFiles
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,8 @@ class MainActivityViewModel @Inject constructor(
 ) :
     ViewModel() {
 
+    var isFirstLaunch = false
+
     private val _lvlDataViewState = MutableStateFlow<LvlDataViewState>(LvlDataViewState.Initial)
     val lvlDataViewState = _lvlDataViewState.asStateFlow()
 
@@ -39,9 +42,19 @@ class MainActivityViewModel @Inject constructor(
                 onAvailable = { InternetState.Fetched },
             )
 
-    fun getTxtFileData() {
+    fun setCurrLvl(lvlId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.setCurrentLvl(lvlId)
+        }
+    }
+
+
+    fun prepareLvls() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.getTxtFile()
+            var ids = repository.getIds().ids
+            val date = repository.getCurrentDate()
+            val currLvl = repository.getCurrentLvl()
             if (result.isSuccessful) {
                 try {
                     val fileStream: InputStream? = result.body()?.byteStream()
@@ -67,7 +80,26 @@ class MainActivityViewModel @Inject constructor(
                             _lvlDataViewState.value = LvlDataViewState.Error(e.toString())
                         }
                     }
-                    _lvlDataViewState.value = LvlDataViewState.Success(dataArray)
+                    if (ids.isEmpty()) {
+                        if (date.isEmpty()) {
+                            isFirstLaunch = true
+                            ids = arrayListOf(0, 1, 2)
+                            ids = ids.plus((3..dataArray.size - 3).shuffled())
+                        } else {
+                            isFirstLaunch = false
+                            ids = dataArray.indices.shuffled()
+                        }
+                        repository.setIds(ids)
+                    } else if (dataArray.size > ids.size) {
+                        ids = ids.plus((ids.size..dataArray.size).shuffled())
+                    }
+                    _lvlDataViewState.value = LvlDataViewState.Success(
+                        UserFiles(
+                            filesData = dataArray,
+                            indexes = ids,
+                            currLvl = currLvl
+                        )
+                    )
                 } catch (e: Exception) {
                     e.printStackTrace()
                     _lvlDataViewState.value = LvlDataViewState.Error(e.toString())
