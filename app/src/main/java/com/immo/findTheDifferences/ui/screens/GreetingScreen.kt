@@ -62,22 +62,6 @@ fun GreetingScreen(isGameScreen: MutableState<Boolean>) {
                 }
             }
         }
-
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(20.dp), contentAlignment = Alignment.TopEnd
-//        ) {
-//            Image(
-//                painter = painterResource(id = R.drawable.ic_settings),
-//                contentDescription = "settings"
-//            )
-//        }
-//        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//            }
-//
-//        }
     }
 }
 
