@@ -29,7 +29,7 @@ fun MainScreen(viewModel: MainActivityViewModel) {
         }
     }
     if (!isGameScreen.value) {
-        GreetingScreen(isGameScreen)
+        GreetingScreen(isGameScreen, viewModel)
     } else {
         viewModel.prepareLvls()
         GameScreen(isGameScreen, viewModel)

@@ -5,6 +5,7 @@ plugins {
     id 'org.jetbrains.kotlin.kapt'
     id 'dagger.hilt.android.plugin'
     id 'org.jetbrains.kotlin.plugin.serialization' version "1.6.10"
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -12,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId "com.immo.FindTheDifferences"
-        minSdk 21
+        minSdk 24
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -79,6 +80,7 @@ dependencies {
     //firebase
     implementation platform('com.google.firebase:firebase-bom:30.2.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.android.gms:play-services-ads:21.0.0'
     implementation("com.google.android.play:review:2.0.0")
     implementation("com.google.android.play:review-ktx:2.0.0")

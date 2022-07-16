@@ -12,6 +12,8 @@ class MainRepository @Inject constructor(
     suspend fun setIds(ids: List<Int>) = prefMgr.setLvlOrder(ids)
     suspend fun setCurrentLvl(lvlId: Int) = prefMgr.setCurrentLvl(lvlId)
     suspend fun getCurrentLvl() = prefMgr.getCurrentLvl()
+    suspend fun isFirstLaunch() = prefMgr.isFirstLaunch()
+    suspend fun setIsFirstLaunch() = prefMgr.setIsFirstLaunch()
     suspend fun setCurrentDate(dateTime: String) = prefMgr.setCurrentDate(dateTime)
     suspend fun getCurrentDate() = prefMgr.getCurrentDate()
 }

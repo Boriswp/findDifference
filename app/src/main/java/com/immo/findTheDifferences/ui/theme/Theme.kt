@@ -51,17 +51,16 @@ fun MyApplicationTheme(
     }
 
     LockScreenOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-    MaterialTheme(
-        colors = colors,
-        typography = Typography,
-        shapes = Shapes,
-        content = content
-    )
     CompositionLocalProvider(
         LocalLocalization provides (localizationMap[locale]
             ?: defaultLocalization)
     ) {
-        content()
+        MaterialTheme(
+            colors = colors,
+            typography = Typography,
+            shapes = Shapes,
+            content = content
+        )
     }
 }
 

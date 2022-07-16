@@ -2,10 +2,7 @@ package com.immo.findTheDifferences.prefs
 
 import android.content.Context
 import androidx.datastore.dataStore
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +16,7 @@ import javax.inject.Singleton
 val Context.themePrefDataStore by preferencesDataStore(PreferenceManagerImpl.PREFS_NAME)
 val Context.dataStore by dataStore("user_ids.json", serializer = UserIdsPrefsSerializer)
 
+@Singleton
 class PreferenceManagerImpl @Inject constructor(@ApplicationContext context: Context) {
 
 
@@ -62,6 +60,25 @@ class PreferenceManagerImpl @Inject constructor(@ApplicationContext context: Con
         }.first()
     }
 
+    suspend fun isFirstLaunch(): Boolean {
+        return dataStore.data.catch {
+            if (it is IOException) {
+                it.printStackTrace()
+                emit(emptyPreferences())
+            } else {
+                throw it
+            }
+        }.map { preference ->
+            preference[PREFS_FIRST_LAUNCH] ?: true
+        }.first()
+    }
+
+    suspend fun setIsFirstLaunch() {
+        dataStore.edit {
+            it[PREFS_FIRST_LAUNCH] = false
+        }
+    }
+
     suspend fun setCurrentDate(dateTime: String) {
         dataStore.edit {
             it[PREFS_DATE_TIME] = dateTime
@@ -86,6 +103,7 @@ class PreferenceManagerImpl @Inject constructor(@ApplicationContext context: Con
         const val PREFS_NAME = "com.immo.FindTheDifferences"
         val PREFS_CURRENT_LVL = intPreferencesKey("lvl_num")
         val PREFS_DATE_TIME = stringPreferencesKey("date_time")
+        val PREFS_FIRST_LAUNCH = booleanPreferencesKey("first_launch")
     }
 }
 

@@ -18,19 +18,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
 import com.immo.findTheDifferences.R
 import com.immo.findTheDifferences.localization.*
 import com.immo.findTheDifferences.localization.Vocabulary.localization
+import com.immo.findTheDifferences.ui.components.SimpleButton
 import com.immo.findTheDifferences.ui.theme.Typography
 
 @Composable
-fun EndLvlsDialog(isGameScreen: MutableState<Boolean>) {
+fun EndLvlsDialog(callback: (isRepeat: Boolean) -> Unit) {
     val context = LocalContext.current
     AlertDialog(
         onDismissRequest = {
-            isGameScreen.value = false
+            callback(false)
         },
         text = {
             Column(
@@ -47,27 +49,27 @@ fun EndLvlsDialog(isGameScreen: MutableState<Boolean>) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_home),
-                        contentDescription = "home",
-                        modifier = Modifier.clickable {
-                            val manager = ReviewManagerFactory.create(context)
-                            val request = manager.requestReviewFlow()
-                            request.addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    val reviewInfo = task.result
-                                    val flow =
-                                        manager.launchReviewFlow(context as Activity, reviewInfo)
-                                    flow.addOnCompleteListener { _ ->
-                                        isGameScreen.value = false
-                                    }
-                                } else {
-                                    val reviewErrorCode = task.exception
-                                    isGameScreen.value = false
+                    SimpleButton(id = R.drawable.ic_home) {
+                        val manager = ReviewManagerFactory.create(context)
+                        val request = manager.requestReviewFlow()
+                        request.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val reviewInfo = task.result
+                                val flow =
+                                    manager.launchReviewFlow(context as Activity, reviewInfo)
+                                flow.addOnCompleteListener { _ ->
+                                    callback(false)
                                 }
+                            } else {
+                                val reviewErrorCode = task.exception
+                                callback(false)
                             }
                         }
-                    )
+                    }
+
+                    SimpleButton(id = R.drawable.ic_retry) {
+                        callback(true)
+                    }
                 }
             }
         },
