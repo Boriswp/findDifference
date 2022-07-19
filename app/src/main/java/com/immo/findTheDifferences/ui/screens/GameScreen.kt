@@ -18,7 +18,6 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewModel) {
 
-
     val tapCounts = rememberSaveable {
         mutableStateOf(0)
     }
@@ -45,15 +44,15 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
                             currState = currState,
                             lvlList,
                             listIndexes,
-                            lvlList.size,
+                            lvlList.size - 1,
                             currLvl,
                             tapCounts,
                             hint
                         ) {
+                            currState.value = UserState.Win
                             currLvl.value++
                             viewModel.setCurrLvl(currLvl.value)
                             hint.value = false
-                            currState.value = UserState.Win
                         }
                     }
                     is UserState.Lose -> {
