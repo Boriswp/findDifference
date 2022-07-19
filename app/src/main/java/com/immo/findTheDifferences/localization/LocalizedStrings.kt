@@ -36,9 +36,9 @@ val main_title = getTranslatable(
 val main_play_button = getTranslatable("Начать", "Start", "Başlamak", "Começar")
 
 val dialog_win = getTranslatable(
-    "Молодец! давай дальше!",
+    "Молодец! Давай дальше!",
     "Well done! Move on!",
-    " Молодец! давай дальше!",
+    "Aferin! Devam edelim!",
     "Bem feito! Ir em frente!"
 )
 

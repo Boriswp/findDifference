@@ -107,13 +107,13 @@ class MainActivityViewModel @Inject constructor(
                 if (ids.isEmpty()) {
                     if (isFirstLaunch) {
                         ids = arrayListOf(0, 1, 2)
-                        ids = ids.plus((3..dataArray.size - 3).shuffled())
+                        ids = ids.plus((3 until dataArray.size).shuffled())
                     } else {
                         ids = dataArray.indices.shuffled()
                     }
                     repository.setIds(ids)
                 } else if (dataArray.size > ids.size) {
-                    ids = ids.plus((ids.size..dataArray.size).shuffled())
+                    ids = ids.plus((ids.size until dataArray.size).shuffled())
                 }
                 _lvlDataViewState.value = LvlDataViewState.Success(
                     UserFiles(

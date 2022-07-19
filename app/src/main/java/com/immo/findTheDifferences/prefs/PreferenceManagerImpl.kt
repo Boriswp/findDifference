@@ -56,7 +56,7 @@ class PreferenceManagerImpl @Inject constructor(@ApplicationContext context: Con
                 throw it
             }
         }.map { preference ->
-            preference[PREFS_CURRENT_LVL] ?: 0
+            preference[PREFS_CURRENT_LVL] ?: 80
         }.first()
     }
 

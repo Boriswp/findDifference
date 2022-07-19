@@ -19,6 +19,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.immo.findTheDifferences.localization.setSupportedLocalesNow
 import com.immo.findTheDifferences.ui.screens.MainScreen
 import com.immo.findTheDifferences.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +33,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setSupportedLocalesNow
         MobileAds.initialize(this) {}
         setContent {
             MyApplicationTheme {

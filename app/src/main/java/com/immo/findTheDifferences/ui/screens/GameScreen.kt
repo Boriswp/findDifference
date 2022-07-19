@@ -33,7 +33,7 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
                 mutableStateOf(res.response.currLvl)
             }
             val currState = remember {
-                mutableStateOf(if (currLvl.value == lvlList.size - 1) UserState.Win else UserState.Initial)
+                mutableStateOf(if (currLvl.value == lvlList.size) UserState.Win else UserState.Initial)
             }
 
             Column(modifier = Modifier.fillMaxSize()) {
@@ -44,7 +44,7 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
                             currState = currState,
                             lvlList,
                             listIndexes,
-                            lvlList.size - 1,
+                            lvlList.size,
                             currLvl,
                             tapCounts,
                             hint
@@ -63,7 +63,7 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
                         }
                     }
                     is UserState.Win -> {
-                        if (currLvl.value < lvlList.size - 1) {
+                        if (currLvl.value < lvlList.size) {
                             YouWinDialog(isGameScreen = isGameScreen) {
                                 tapCounts.value = 0
                                 if (currLvl.value % 3 == 0) {
