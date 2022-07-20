@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
@@ -31,6 +32,7 @@ import com.immo.findTheDifferences.ui.theme.Typography
 fun EndLvlsDialog(callback: (isRepeat: Boolean) -> Unit) {
     val context = LocalContext.current
     AlertDialog(
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
         onDismissRequest = {
             callback(false)
         },

@@ -1,6 +1,5 @@
 package com.immo.findTheDifferences.ui.screens
 
-import android.service.autofill.SaveCallback
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -8,7 +7,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
@@ -39,6 +37,7 @@ import com.immo.findTheDifferences.localization.game_lvl_of
 import com.immo.findTheDifferences.remote.FilesData
 import com.immo.findTheDifferences.ui.components.TimeIndicator
 import com.immo.findTheDifferences.ui.theme.Typography
+import java.util.*
 import kotlin.random.Random
 
 @Composable
@@ -52,6 +51,18 @@ fun LvlLogic(
     hint: MutableState<Boolean>,
     saveCallback: () -> Unit
 ) {
+    var index by remember {
+        mutableStateOf(0)
+    }
+    var currLvlData by remember {
+        mutableStateOf(FilesData())
+    }
+    try {
+        index = listIndexes[currLvl.value]
+        currLvlData = currLvlsData[index]
+    } catch (e: Exception) {
+        currLvlData = currLvlsData.random()
+    }
     val haptic = LocalHapticFeedback.current
     val configuration = LocalConfiguration.current
     var bottomHeight by remember {
@@ -94,7 +105,7 @@ fun LvlLogic(
         }
 
         SubcomposeAsyncImage(
-            model = Const.BASE_URL_FOR_PICTURES + currLvlsData[listIndexes[currLvl.value]].picture_background,
+            model = Const.BASE_URL_FOR_PICTURES + currLvlData.picture_background,
             contentDescription = "",
             contentScale = ContentScale.FillBounds,
             modifier = Modifier
@@ -129,7 +140,7 @@ fun LvlLogic(
         }
 
         SubcomposeAsyncImage(
-            model = Const.BASE_URL_FOR_PICTURES + currLvlsData[listIndexes[currLvl.value]].picture_foreground,
+            model = Const.BASE_URL_FOR_PICTURES + currLvlData.picture_foreground,
             contentDescription = "",
             contentScale = ContentScale.FillBounds,
             modifier = Modifier
@@ -164,7 +175,7 @@ fun LvlLogic(
             contentAlignment = Alignment.BottomCenter
         ) {
             Text(
-                text = "${localization.game_lvl_finished()} ${currLvl.value} ${localization.game_lvl_of()} $totalLvls",
+                text = if (localization.locale != Locale("tr")) "${localization.game_lvl_finished()} ${currLvl.value} ${localization.game_lvl_of()} $totalLvls" else " $totalLvls ${localization.game_lvl_of()} ${currLvl.value} ${localization.game_lvl_finished()}",
                 textAlign = TextAlign.Center,
                 style = Typography.h2,
                 color = if (isSystemInDarkTheme()) Color.White else Color.Black,
@@ -188,22 +199,22 @@ fun LvlLogic(
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .padding(
-                        start = (currLvlsData[listIndexes[currLvl.value]].padding_left * start).dp,
-                        top = ((currLvlsData[listIndexes[currLvl.value]].padding_top * top).dp)
+                        start = (currLvlData.padding_left * start).dp,
+                        top = ((currLvlData.padding_top * top).dp)
                     )
-                    .height(currLvlsData[listIndexes[currLvl.value]].object_height.dp)
-                    .width(currLvlsData[listIndexes[currLvl.value]].object_width.dp)
+                    .height(currLvlData.object_height.dp)
+                    .width(currLvlData.object_width.dp)
             )
         }
 
         Box(
             Modifier
                 .padding(
-                    start = (currLvlsData[listIndexes[currLvl.value]].padding_left * start).dp,
-                    top = ((currLvlsData[listIndexes[currLvl.value]].padding_top * top).dp)
+                    start = (currLvlData.padding_left * start).dp,
+                    top = ((currLvlData.padding_top * top).dp)
                 )
-                .height(currLvlsData[listIndexes[currLvl.value]].object_height.dp)
-                .width(currLvlsData[listIndexes[currLvl.value]].object_width.dp)
+                .height(currLvlData.object_height.dp)
+                .width(currLvlData.object_width.dp)
                 .clickable {
                     if (!isShaking) {
                         saveCallback()

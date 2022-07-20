@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.immo.findTheDifferences.R
 import com.immo.findTheDifferences.localization.*
 import com.immo.findTheDifferences.localization.Vocabulary.localization
@@ -23,6 +24,7 @@ import com.immo.findTheDifferences.ui.theme.Typography
 @Composable
 fun YouWinDialog(isGameScreen: MutableState<Boolean>, callback: () -> Unit) {
     AlertDialog(
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
         onDismissRequest = {
             isGameScreen.value = false
         },

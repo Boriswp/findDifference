@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.immo.findTheDifferences.ui.components.SimpleButton
 import com.immo.findTheDifferences.ui.screens.showRewardedAD
 
@@ -25,6 +26,7 @@ fun YouLoseDialog(isGameScreen: MutableState<Boolean>, callback: (hintReward: Bo
         onDismissRequest = {
             isGameScreen.value = false
         },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
         text = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
