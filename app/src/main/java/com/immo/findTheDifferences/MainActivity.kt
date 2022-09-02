@@ -1,6 +1,7 @@
 package com.immo.findTheDifferences
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -22,6 +23,7 @@ import com.google.android.gms.ads.MobileAds
 import com.immo.findTheDifferences.localization.setSupportedLocalesNow
 import com.immo.findTheDifferences.ui.screens.MainScreen
 import com.immo.findTheDifferences.ui.theme.MyApplicationTheme
+import com.yandex.metrica.YandexMetrica
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -70,6 +72,23 @@ class MainActivity : ComponentActivity() {
         }
         observeViewModel()
     }
+
+    override fun onStart() {
+        YandexMetrica.reportEvent("StartGame")
+        super.onStart()
+    }
+
+
+    override fun onPause() {
+        lifecycleScope.launch {
+            val tuple = viewModel.getCurrLvl()
+            Log.d("currLvl",tuple.first.toString())
+            val eventParameters = "{\"lvl\":\"${tuple.first}\",\"id\":\"${tuple.second}\"}"
+            YandexMetrica.reportEvent("GameOnPause", eventParameters)
+        }
+        super.onPause()
+    }
+
 
     private fun observeViewModel() {
         lifecycleScope.launch {

@@ -14,6 +14,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.immo.findTheDifferences.Const.AD_INTERSTITIAL_ID
 import com.immo.findTheDifferences.Const.AD_REWARDED_ID
 import com.immo.findTheDifferences.MainActivity
+import com.yandex.metrica.YandexMetrica
 import timber.log.Timber
 
 fun showAd(context: Context, callback: () -> Unit) {
@@ -88,7 +89,9 @@ fun showRewardedAD(context: Context, callback: (rewarded: Boolean) -> Unit) {
                     }
 
                 }
-                rewardedAd.show(context as MainActivity) { isRewarded = true }
+                rewardedAd.show(context as MainActivity) {
+                    YandexMetrica.reportEvent("Rewarded")
+                    isRewarded = true }
             }
         })
 }

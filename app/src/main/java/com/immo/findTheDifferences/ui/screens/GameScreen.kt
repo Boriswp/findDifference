@@ -13,7 +13,8 @@ import com.immo.findTheDifferences.ui.dialogs.EndLvlsDialog
 import com.immo.findTheDifferences.ui.dialogs.ErrorDialog
 import com.immo.findTheDifferences.ui.dialogs.YouLoseDialog
 import com.immo.findTheDifferences.ui.dialogs.YouWinDialog
-import kotlinx.coroutines.runBlocking
+import com.yandex.metrica.YandexMetrica
+
 
 @Composable
 fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewModel) {
@@ -40,6 +41,8 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
 
                 when (currState.value) {
                     is UserState.Initial -> {
+                        val eventParameters = "{\"lvl\":\"${currLvl.value}\",\"id\":\"${lvlList[currLvl.value].level_id}\"}"
+                        YandexMetrica.reportEvent("Curr Lvl", eventParameters)
                         LvlLogic(
                             currState = currState,
                             lvlList,
@@ -56,6 +59,8 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
                         }
                     }
                     is UserState.Lose -> {
+                        val eventParameters = "{\"lvl\":\"${currLvl.value}\",\"id\":\"${lvlList[currLvl.value].level_id}\"}"
+                        YandexMetrica.reportEvent("Lose", eventParameters)
                         YouLoseDialog(isGameScreen = isGameScreen) {
                             hint.value = it
                             tapCounts.value = 0
@@ -64,9 +69,12 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
                     }
                     is UserState.Win -> {
                         if (currLvl.value < lvlList.size) {
+                            val eventParameters = "{\"lvl\":\"$currLvl\",\"id\":\"${lvlList[currLvl.value].level_id}\"}"
+                            YandexMetrica.reportEvent("Win", eventParameters)
                             YouWinDialog(isGameScreen = isGameScreen) {
                                 tapCounts.value = 0
-                                if (currLvl.value % 3 == 0) {
+                                //currLvl.value % 3 == 0
+                                if (false) {
                                     if (currLvl.value == 0) {
                                         currState.value = UserState.Initial
                                     } else {
@@ -77,6 +85,7 @@ fun GameScreen(isGameScreen: MutableState<Boolean>, viewModel: MainActivityViewM
                                 }
                             }
                         } else {
+                            YandexMetrica.reportEvent("EndGame")
                             EndLvlsDialog {
                                 if (it) {
                                     viewModel.dropLvls()

@@ -24,4 +24,5 @@ object Const {
     const val AD_BANNER_ID = "ca-app-pub-4546277468633552/5346503244"
     const val AD_INTERSTITIAL_ID = "ca-app-pub-4546277468633552/2528768217"
     const val AD_REWARDED_ID = "ca-app-pub-4546277468633552/2883173193"
+    const val APP_METRICA = "875ba690-c8f8-44e8-b4be-2ab4bb6b6cbc"
 }

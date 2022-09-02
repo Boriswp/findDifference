@@ -10,6 +10,7 @@ import com.immo.findTheDifferences.remote.UserFiles
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -31,6 +32,24 @@ class MainActivityViewModel @Inject constructor(
     networkStatusTracker: NetworkStatusTracker
 ) :
     ViewModel() {
+
+
+    suspend fun getCurrLvl(): Pair<Int, Int> {
+        val job = viewModelScope.async {
+            val currLvl = repository.getCurrentLvl()
+            when (_lvlDataViewState.value) {
+                is LvlDataViewState.Success -> {
+                    val id =
+                        (_lvlDataViewState.value as LvlDataViewState.Success).response.filesData[currLvl].level_id
+                    return@async Pair(currLvl, id)
+                }
+                else -> {
+                    return@async Pair(-1, -1)
+                }
+            }
+        }
+        return job.await()
+    }
 
     var isFirstLaunch = true
 
