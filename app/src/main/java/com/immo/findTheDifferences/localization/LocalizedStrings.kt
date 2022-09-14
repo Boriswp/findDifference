@@ -27,13 +27,13 @@ fun getTranslatable(
     )
 
 val main_title = getTranslatable(
-    "Тест на внимательность",
-    "The Mindfulness Test",
-    "Bilinçli Farkındalık (Mindfulness) Ölçeği Testi",
-    "Teste de atenção plena"
+    "Мозголомка, тренировка внимания",
+    "Brain Game, Attention Training",
+    "Brain Game, Attention Training",
+    "Brain Game, Attention Training"
 )
 
-val main_play_button = getTranslatable("Начать", "Start", "Başlamak", "Começar")
+val main_play_button = getTranslatable("Начать", "PLAY", "Başlamak", "Começar")
 
 val dialog_win = getTranslatable(
     "Молодец! Давай дальше!",
